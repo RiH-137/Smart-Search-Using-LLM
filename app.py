@@ -4,22 +4,28 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 
-# Load the pre-trained model
+## loading the model
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
-# Load the embeddings data from the JSON file
+## loading the data from the json file
 with open('embeddings_data.json', 'r') as file:
     courses_data = json.load(file)
 
-# Extract the embeddings and titles
+## extracting the embeddings and the course titles
 course_embeddings = [np.array(course['embedding']) for course in courses_data]
 course_titles = [course['title'] for course in courses_data]
 
-# Function to get query embedding
+
+
+## functions to get the query embedding
 def get_query_embedding(query):
     return model.encode(query, convert_to_tensor=True)
 
-# Function to add relevance factors
+
+
+
+## function to add relevance factors
+
 def add_relevance_factors(similarities, indices):
     relevance_factor = 0.2  # Weight for curriculum match
     enhanced_scores = []
@@ -32,28 +38,30 @@ def add_relevance_factors(similarities, indices):
     enhanced_scores.sort(key=lambda x: x[1], reverse=True)
     return [x[0] for x in enhanced_scores]
 
-# Streamlit UI for input
+## streamlit
 st.title('Course Recommendation System')
 st.write('Enter a search query to find relevant courses')
 
-# Input box for the search query
+
 user_query = st.text_input('Search Query')
 
 if user_query:
-    # Convert the user query to embedding
+    ## conversion of the query to an embedding
     query_embedding = get_query_embedding(user_query)
 
-    # Calculate cosine similarities
+    ## calculating the cosine similarity between the query and the course embeddings
+
+    ## cosine similarity--> dot product of the query embedding and the course embedding divided by the product of the norms of the two embeddings
     cosine_similarities = cosine_similarity([np.array(query_embedding)], course_embeddings)
 
-    # Get top 5 most similar courses
+    ## result for the top 5 search
     top_k = 5
     top_indices = cosine_similarities[0].argsort()[-top_k:][::-1]
 
-    # Apply relevance factors (optional)
+  
     top_indices_with_relevance = add_relevance_factors(cosine_similarities[0], top_indices)
 
-    # Display the top results
+   ## displaying the result
     st.write("### Top Course Recommendations")
     for i in top_indices_with_relevance:
         st.write(f"**Title**: {course_titles[i]}")
