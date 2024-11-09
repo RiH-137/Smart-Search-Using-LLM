@@ -1,0 +1,2 @@
+1. webscapping is done using bs4
+2. 

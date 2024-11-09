@@ -1,0 +1,8 @@
+transformers
+tf-keras
+numpy
+scikit-learn
+pandas
+tensorflow
+streamlit
+sentence-transformers
